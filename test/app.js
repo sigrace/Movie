@@ -1,6 +1,9 @@
 var express = require('express');
 var path = require('path');
 var mongoose = require('mongoose');
+var cookieParser = require('cookie-parser');
+var session= require('express-session');
+var MongoStore = require('connect-mongo')(session);
 var _ = require('underscore');
 var Movie = require('./models/movie');
 var User = require('./models/user');
@@ -12,14 +15,33 @@ mongoose.connect('mongodb://localhost/imooc');
 app.set('views','./views/pages');
 app.set('view engine','jade');
 app.use(require('body-parser').urlencoded({extended: true}));
+app.use(cookieParser());
+app.use(session({
+	secret: 'iommc',
+	store: new MongoStore({
+		url: 'mongodb://localhost/imooc',
+		collection:'sessions'
+	})
+}));
 app.use(express.static(path.join(__dirname,'public')));
 
 app.locals.moment = require('moment');
 app.listen(port);
 console.log('app is listening on port ' + port);
 
+//pre handle user
+app.use(function (req,res,next){
+	var _user = req.session.user;
+	if(_user){
+		app.locals.user = _user;
+	}
+	return next();
+})
+
 //idnex page
 app.get('/',function (req,res){
+	// console.log('user in session');
+	// console.log(req.session.user);
 	Movie.fetch(function (err,movies){
 		if(err){
 			console.log(err);
@@ -52,6 +74,43 @@ app.post('/user/signup',function (req,res){
 			});
 		}
 	})
+})
+
+//signin
+app.post('/user/signin',function(req,res){
+	var _user = req.body.user;
+	var name = _user.name;
+	var password = _user.password;
+
+	User.findOne({name:name},function(err,user){
+		if(err){
+			console.log(err);
+		}
+		if(!user){
+			return res.redirect('/');
+		}
+
+		user.comparePassword(password,function(err,isMatch){
+			if(err){
+				console.log(err);
+			}
+			if(isMatch){
+				req.session.user = user;
+
+				return res.redirect('/');
+			}
+			else{
+				console.log('Password is not matched');
+			}
+		})
+	})
+})
+
+//logout page
+app.get('/logout',function(req,res){
+	 delete req.session.user;
+	 delete app.locals.user;
+	 res.redirect('/');
 })
 
 //userlist page

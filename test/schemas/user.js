@@ -42,6 +42,15 @@ UserSchema.pre('save',function (next) {
 	// next();
 });
 
+UserSchema.methods = {
+	comparePassword:function(_password,cb){
+		bcrypt.compare(_password,this.password,function(err,isMatch){
+			if(err) return cb(err);
+
+			cb(null,isMatch);
+		})
+	}
+}
 UserSchema.statics = {
 	fetch: function (cb){             //取出目前数据可里的所有数据
 		return this
