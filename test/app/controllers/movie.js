@@ -1,4 +1,5 @@
 var Movie = require('../models/movie');
+var Comment = require('../models/comment');
 var _ = require('underscore');
 
 
@@ -7,10 +8,16 @@ var _ = require('underscore');
 		var id = req.params.id;
 
 		Movie.findById(id,function (err,movie){
-			res.render('detail',{
-				title:'imooc ' + movie.title,
-				movie:movie
-			});
+			Comment
+			.find({movie:id})
+			.populate('from','name')
+			.exec(function (err,comments){
+				res.render('detail',{
+					title:'imooc ' + movie.title,
+					movie:movie,
+					comments: comments
+				});
+			})
 		})
 	};
 
