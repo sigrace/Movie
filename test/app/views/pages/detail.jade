@@ -14,7 +14,8 @@ block content
 							each item in comments
 								li.media
 									.pull-left
-										a.comment(href="#comments", data-cid="#{item._id}", data-tid="#{item.from._id}")
+										//- 保存着comment本身的id和comment来自于的id
+										a.comment(href="#comments", data-cid="#{item._id}", data-tid="#{item.from._id}")  
 											img.media-object(src="", style="width:64px;height:64px;")
 									.media-body
 										h4.media-heading #{item.from.name}
@@ -26,7 +27,7 @@ block content
 														a.comment(href="#comments", data-cid="#{item._id}", data-tid="#{reply.from._id}")
 															img.media-object(src="", style="width:64px;height:64px;")
 													.media-body
-														h4.media-heading 
+														h4.media-heading
 															| #{reply.from.name}
 															span.text-info &nbsp;回复&nbsp;
 															| #{reply.to.name}:

@@ -1,20 +1,10 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+var Schema  = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
 
-var MovieSchema = new Schema({
-	doctor:String,
-	title:String,
-	language:String,
-	country:String,
-	summary:String,
-	flash:String,
-	poster:String,
-	year:Number,
-	catetory: {
-		type: ObjectId,
-		ref: 'Catetory'
-	},
+var CatetorySchema = new Schema({
+	name: String,
+	movies :[{type: ObjectId, ref:"Movie"}],
 	meta:{
 		createAt:{
 			type: Date,
@@ -27,7 +17,7 @@ var MovieSchema = new Schema({
 	}
 });
 
-MovieSchema.pre('save',function (next) {
+CatetorySchema.pre('save',function (next) {
 	if(this.isNew){
 		this.meta.createAt = this.meta.updateAt = Date.now();
 	}
@@ -37,7 +27,7 @@ MovieSchema.pre('save',function (next) {
 	next();
 });
 
-MovieSchema.statics = {
+CatetorySchema.statics = {
 	fetch: function (cb){             //取出目前数据可里的所有数据
 		return this
 			.find({})          
@@ -51,7 +41,7 @@ MovieSchema.statics = {
 	}
 }
 
-module.exports = MovieSchema;
+module.exports = CatetorySchema;
 
 
 

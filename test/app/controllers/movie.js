@@ -1,5 +1,6 @@
 var Movie = require('../models/movie');
 var Comment = require('../models/comment');
+var Catetory = require('../models/catetory');
 var _ = require('underscore');
 
 
@@ -25,18 +26,12 @@ var _ = require('underscore');
 
 	//admin page
 	exports.new = function (req,res){
-		res.render('admin',{
-			title:'imooc 后台录入页',
-			movie:{
-				doctor:'',
-				country:'',
-				title:'',
-				year:'',
-				poster:'',
-				language:'',
-				flash:'',
-				summary:''
-			}
+		Catetory.find({},function (err,catetories){
+			res.render('admin',{
+				title:'imooc 后台录入页',
+				movie: {},
+				catetories: catetories
+			})
 		})
 	};
 
@@ -45,9 +40,12 @@ var _ = require('underscore');
 		var id = req.params.id;
 		if(id){
 			Movie.findById(id,function (err,movie){
-				res.render('admin',{
-					title:'imooc 后台更新页',
-					movie : movie
+				Catetory.find({}, function(err,catetories){
+					res.render('admin',{
+						title:'imooc 后台更新页',
+						movie : movie,
+						catetories:catetories
+					})
 				})
 			})
 		}
@@ -59,41 +57,52 @@ var _ = require('underscore');
 		var id = req.body.movie._id;
 		var movieObj = req.body.movie;
 		var _movie;
-		// if(id!=='undefined'){
-		// 	Movie.findById(id,function (err,movie){
-		// 		if(err){
-		// 			console.log(err);
-		// 		}
-
-		// 		_movie = _.extend(movie,movieObj);
-		// 		_movie.save(function (err,movie){
-		// 			if(err){
-		// 				console.log(err);
-		// 			}
-
-		// 			res.redirect('/movie/' + movie._id);
-		// 		});
-		// 	})
-		// }
-		// else{
-			_movie = new Movie({
-				doctor:   movieObj.doctor,
-				title:    movieObj.title,
-				country:  movieObj.country,
-				language: movieObj.language,
-				year:     movieObj.year,
-				poster:   movieObj.poster,
-				summary:  movieObj.summary,
-				flash:    movieObj.flash
-			})
-			_movie.save(function (err,movie){
+		if(id){
+			Movie.findById(id,function (err,movie){
 				if(err){
 					console.log(err);
 				}
 
-				res.redirect('/movie/' + movie._id);
+				_movie = _.extend(movie,movieObj);
+				_movie.save(function (err,movie){
+					if(err){
+						console.log(err);
+					}
+
+					res.redirect('/movie/' + movie._id);
+				});
 			})
-		// }
+		}
+		else{
+			_movie = new Movie(movieObj);
+			var catetoryId = movieObj.catetory;
+			var catetoryName = movieObj.catetoryName;
+			_movie.save(function (err,movie){
+				if(err){
+					console.log(err);
+				}
+				if(catetoryId){
+					Catetory.findById(catetoryId, function(err,catetory){
+						catetory.movies.push(movie._id);
+						catetory.save(function(err,catetory){
+							res.redirect('/movie/' + movie._id);
+						})
+					})
+				}
+				else if (catetoryName){
+					var catetory = new Catetory({
+						name:catetoryName,
+						movies:[movie._id]
+					})
+					catetory.save(function(err,catetory){
+						movie.catetory = catetory._id;
+						movie.save(function (err,movie){
+							res.redirect('/movie/' + movie._id);
+						})
+					})
+				}
+			})
+		}
 	};
 
 	//list page

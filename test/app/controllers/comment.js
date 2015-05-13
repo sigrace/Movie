@@ -4,7 +4,7 @@ var Comment = require('../models/comment');
 exports.save = function (req,res){
 	var _comment = req.body.comment;
 	var movieId = _comment.movie;
-	if(_comment.cid){             //检查是否有comment.id,点击头像才会产生
+	if(_comment.cid){             //检查是否有comment.cid,点击头像才会产生
 		Comment.findById(_comment.cid,function (err,comment){
 			var reply = {             //具体回复的内容
 				from: _comment.from,
@@ -26,7 +26,6 @@ exports.save = function (req,res){
 			if(err){
 				console.log(err);
 			}
-
 			res.redirect('/movie/' + movieId);
 		})
 	}

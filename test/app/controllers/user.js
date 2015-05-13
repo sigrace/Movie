@@ -1,6 +1,5 @@
 var User = require('../models/user');
 
-
 	//signup 
 	//showSignup
 	exports.showSignup = function(req,res){
