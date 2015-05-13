@@ -6,12 +6,13 @@ block content
 			each cat in catetories
 				.panel.panel-default
 					.panel-heading
-						h3 #{cat.name}
+						h3 
+							a(href='/results?cat=#{cat._id}&p=0') #{cat.name}
 					.panel-body
 						if cat.movies && cat.movies.length > 0
 							each item in cat.movies
 								.col-md-2
-									.thumbanil
+									.thumbnail
 										a(href='/movie/#{item._id}')
 											img(src="#{item.poster}", alt="#{item.title}")
 										.caption

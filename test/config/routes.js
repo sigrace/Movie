@@ -44,4 +44,8 @@ module.exports = function(app){
 	app.post('/admin/catetory', User.signinRequired, User.adminRequired, Catetory.save);
 	app.get('/admin/catetory/list', User.signinRequired, User.adminRequired, Catetory.list);
 
+	//results
+	app.get('/results',Index.search);
+
+
 };
