@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var session= require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var logger = require('morgan');
+var multipart = require('connect-multiparty');
 
 var port = process.env.PORT || 3000;
 var app = express();
@@ -15,6 +16,7 @@ app.set('views','./app/views/pages');
 app.set('view engine','jade');
 
 app.use(require('body-parser').urlencoded({extended: true}));
+app.use(multipart());
 app.use(cookieParser());
 app.use(session({
 	secret: 'iommc',
